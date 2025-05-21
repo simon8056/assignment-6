@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>VueFilmLista</title>
+</head>
+
+<body>
+    <div id="container">
+
+        <h1>Min filmlista</h1>
+
+        <form @submit.prevent="addMovie">
+            <fieldset>
+                <legend>Lägg till en film</legend>
+
+                <label for="title-field">Title:</label>
+                <input type="text" id="title-field" class="form-control" v-model="title">
+
+                <label for="rating-field">Betyg:</label>
+
+                <select id="rating-field" class="form-control" v-model.number="rating">
+                    <option value="0">Välj betyg här...</option>
+                    <option v-for="n in 5" :value="n">{{n}}</option>
+                </select>
+
+                <input type="submit" class="btn btn-success mt-3" value="Spara film">
+
+            </fieldset>
+        </form>
+
+        <hr>
+
+        <h2>Filmer</h2>
+
+        <ul id="movies">
+            <li v-for="(movie, index) in movies" :key="index"> 
+                {{movie.title}}
+                <img src="delete.png" alt="Radera ikon" @click="deleteMovie(index)"> 
+                <img src="star.png" alt="Betyg ikon" v-for="n in movie.rating" :key="n"> 
+            </li>
+        </ul>
+
+        <button @click="orderByAlphaButton" class="btn btn-primary mt-3">Sortera i alfabetisk ordning</button>
+        <button @click="orderByGradeButton" class="btn btn-warning mt-3">Sortera efter betyg</button>
+
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            // Definierar den data som används i appen
+            data() {
+                return {
+                    title: "",
+                    rating: 0,
+                    movies: []
+                };
+            },
+
+            methods: {
+                // Tillåter användaren att lägga till en ny film i listan, ge titel och betyg. Ger även felmeddelande om titel eller betyg inte är ifyllt
+                addMovie() { 
+                    if (this.title == "") {
+                        alert("Du måste fylla i en titel!");
+                        return;
+                    }
+                    if (this.rating == 0) {
+                        alert("Du måste sätta ett betyg!");
+                        return;
+                    }
+                    this.movies.push({ title: this.title, rating: this.rating });
+                    this.title = "";
+                    this.rating = 0;
+                },
+                // Denna körs när användaren klickar på radera knappen och raderar filmen från listan
+                deleteMovie(index) {
+                    this.movies.splice(index, 1);
+                },
+                // Denna körs när användaren klickar på sortera alfabetisk ordning knappen och sorterar då filmerna i alfabetisk ordning
+                orderByAlphaButton() {
+                    this.movies.sort(function(a, b) {
+                        return a.title.localeCompare(b.title);
+                    });
+                },
+                // Denna körs när användaren klickar på sortera efter betyg knappen och sorterar då filmerna efter betyg
+                orderByGradeButton() {
+                    this.movies.sort(function(a, b) {
+                        if (a.rating > b.rating) return -1;
+                        if (a.rating < b.rating) return 1;
+                        return 0;
+                    }); 
+                }
+            }
+        })
+
+        app.mount("#container");
+    </script>
+
+</body>
+
+</html>
